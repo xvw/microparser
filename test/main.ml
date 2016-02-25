@@ -52,15 +52,13 @@ let testParseChar2 _ =
   let message =
     Parser.run parseA "BHA"
     |> extract_failure
-  in
-  assert_equal (Parser.expected 'A' 'B') message
+   in assert_equal (Parser.expected 'A' 'B') message
 
 let testFollowed1 _ =
   let ((a, b), remaining) =
     Parser.run parseAandB "ABFOO"
     |> extract_success
-  in
-  assert_equal ((a, b), remaining) (('A', 'B'), "FOO")
+  in assert_equal ((a, b), remaining) (('A', 'B'), "FOO")
 
 let testFollowed2 _ =
   let message  =
@@ -78,53 +76,49 @@ let testDisjunction1 _ =
   let (c, rem) =
     Parser.run parseAorB "BETA"
     |> extract_success
-  in
-  assert_equal (c, rem) ('B', "ETA")
+  in assert_equal (c, rem) ('B', "ETA")
 
 let testDisjunction2 _ =
   let (c2, rem2) =
     Parser.run parseAorB "ALPHA"
     |> extract_success
-  in
-  assert_equal (c2, rem2) ('A', "LPHA")
+  in assert_equal (c2, rem2) ('A', "LPHA")
 
 let testDisjunction3 _ =
   let message =
     Parser.run parseAorB "ZETA"
     |> extract_failure
-  in
-  assert_equal (Parser.expected 'B' 'Z') message
-
+  in assert_equal (Parser.expected 'B' 'Z') message
 
 let testChoice1 _ =
   let (c, rem) =
     Parser.run parserabZ "areste"
     |> extract_success
-  in
-  assert_equal (c, rem) ('a', "reste")
+  in assert_equal (c, rem) ('a', "reste")
 
 let testChoice1 _ =
   let (c, rem) =
     Parser.run parserabZ "areste"
     |> extract_success
-  in
-  assert_equal (c, rem) ('a', "reste")
+  in assert_equal (c, rem) ('a', "reste")
 
 let testChoice2 _ =
   let (c, rem) =
     Parser.run parserabZ "breste"
     |> extract_success
-  in
-  assert_equal (c, rem) ('b', "reste")
+  in assert_equal (c, rem) ('b', "reste")
 
 let testChoice3 _ =
   let (c, rem) =
     Parser.run parserabZ "Zreste"
     |> extract_success
-  in
-  assert_equal (c, rem) ('Z', "reste")
+  in assert_equal (c, rem) ('Z', "reste")
 
-
+let testChoice4 _ =
+  let message =
+    Parser.run parserabZ "zReste"
+    |> extract_failure
+  in assert_equal (Parser.expected 'Z' 'z') message
 
 
 let suite =
@@ -137,6 +131,9 @@ let suite =
   ; "testDisjunction2" >:: testDisjunction2
   ; "testDisjunction3" >:: testDisjunction3
   ; "testChoice1"      >:: testChoice1
+  ; "testChoice2"      >:: testChoice2
+  ; "testChoice3"      >:: testChoice3
+  ; "testChoice4"      >:: testChoice4
   ]
 
 let _ = run_test_tt_main suite
