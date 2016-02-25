@@ -68,22 +68,26 @@ let testFollowed2 _ =
   assert_equal (Parser.expected 'B' 'Z') message;
   assert_equal (Parser.expected 'A' 'B') message2
 
-let testDisjunction _ =
+let testDisjunction1 _ =
   let (c, rem) =
     Parser.run parseAorB "BETA"
     |> extract_success
   in
-  let _ = assert_equal (c, rem) ('B', "ETA") in
+  assert_equal (c, rem) ('B', "ETA")
+
+let testDisjunction2 _ =
   let (c2, rem2) =
     Parser.run parseAorB "ALPHA"
     |> extract_success
   in
-  let _ = assert_equal (c2, rem2) ('A', "LPHA") in
+  assert_equal (c2, rem2) ('A', "LPHA")
+
+let testDisjunction3 _ =
   let message =
     Parser.run parseAorB "ZETA"
     |> extract_failure
   in
-  assert_equal (Parser.expected 'A' 'Z') message
+  assert_equal (Parser.expected 'B' 'Z') message
 
 
 let testChoice _ =
@@ -93,7 +97,11 @@ let testChoice _ =
       (char 'Z')]
     )
   in
-  ()
+  let (c, rem) =
+    Parser.run parser "areste"
+    |> extract_success
+  in
+  assert_equal (c, rem) ('a', "reste")
 
 
 let suite =
@@ -102,8 +110,10 @@ let suite =
   ; "testParseChar2"   >:: testParseChar2
   ; "testFollowed1"    >:: testFollowed1
   ; "testFollowed2"    >:: testFollowed2
-  ; "testDisjunction"  >:: testDisjunction
-  ; "testChoice"      >:: testChoice
+  ; "testDisjunction1" >:: testDisjunction1
+  ; "testDisjunction2" >:: testDisjunction2
+  ; "testDisjunction3" >:: testDisjunction3
+  ; "testChoice"       >:: testChoice
   ]
 
 let _ = run_test_tt_main suite
