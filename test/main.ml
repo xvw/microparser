@@ -25,6 +25,12 @@ let parseA = Parser.char 'A'
 let parseB = Parser.char 'B'
 let parseAandB = Parser.(parseA >& parseB)
 let parseAorB = Parser.(parseA >| parseB)
+let parserabZ = Parser.(choice [
+    (char 'a');
+    (char 'b');
+    (char 'Z')]
+  )
+
 
 let extract_success = function
   | Result.Success x -> x
@@ -90,18 +96,35 @@ let testDisjunction3 _ =
   assert_equal (Parser.expected 'B' 'Z') message
 
 
-let testChoice _ =
-  let parser = Parser.(choice [
-      (char 'a');
-      (char 'b');
-      (char 'Z')]
-    )
-  in
+let testChoice1 _ =
   let (c, rem) =
-    Parser.run parser "areste"
+    Parser.run parserabZ "areste"
     |> extract_success
   in
   assert_equal (c, rem) ('a', "reste")
+
+let testChoice1 _ =
+  let (c, rem) =
+    Parser.run parserabZ "areste"
+    |> extract_success
+  in
+  assert_equal (c, rem) ('a', "reste")
+
+let testChoice2 _ =
+  let (c, rem) =
+    Parser.run parserabZ "breste"
+    |> extract_success
+  in
+  assert_equal (c, rem) ('b', "reste")
+
+let testChoice3 _ =
+  let (c, rem) =
+    Parser.run parserabZ "Zreste"
+    |> extract_success
+  in
+  assert_equal (c, rem) ('Z', "reste")
+
+
 
 
 let suite =
@@ -113,7 +136,7 @@ let suite =
   ; "testDisjunction1" >:: testDisjunction1
   ; "testDisjunction2" >:: testDisjunction2
   ; "testDisjunction3" >:: testDisjunction3
-  ; "testChoice"       >:: testChoice
+  ; "testChoice1"      >:: testChoice1
   ]
 
 let _ = run_test_tt_main suite
