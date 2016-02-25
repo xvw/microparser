@@ -1,0 +1,30 @@
+OASISFormat: 0.4
+BuildTools: ocamlbuild
+Plugins: META (0.4), DevFiles (0.4)
+
+Name: Parser
+Version: 0.1
+Synopsis: A library for parsing
+Authors: Xavier Van de Woestyne <xaviervdw@gmail.com>
+License: GPL
+Description: A small library for parsing in OCaml
+Homepage: http://xvw.github.io
+
+Library "parser"
+  Path: lib
+  Modules: Parser
+  InternalModules: Result, Util
+
+Executable "test_parser"
+  Path: test
+  MainIs: main.ml
+  Build$: flag(tests)
+  CompiledObject: best
+  Install: false
+  BuildDepends: parser, oUnit
+
+Test "test_parser"
+  Run$: flag(tests)
+  TestTools: test_parser
+  Command: $test_parser
+  WorkingDirectory: test
