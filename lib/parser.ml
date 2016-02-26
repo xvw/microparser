@@ -20,20 +20,30 @@
 *)
 
 
-type 'a result = ('a, string) Result.t
+type 'a result = ('a *string, string) Result.t
 type 'a t = Parser of (string -> 'a result)
-
-open Result
 open Util
 
 let run parser input =
   let Parser f = parser in
   f input
 
+let return x =
+  Parser (fun input -> Result.Success (x, input))
+
 let expected =
   Printf.sprintf "Excepted %c, got %c"
 
+let map f parser =
+  let open Result in
+  let aux input =
+    match run parser input with
+    | Success (x, xs) -> return (f x, xs)
+    | Failure err -> fail err
+  in Parser aux
+
 let char c =
+  let open Result in
   let aux input =
     let len = String.length input in
     if len == 0 then fail "Empty string"
@@ -43,6 +53,7 @@ let char c =
   in Parser aux
 
 let followed parser1 parser2 =
+  let open Result in
   let aux input =
     match run parser1 input with
     | Failure x as failure-> failure
@@ -54,6 +65,7 @@ let followed parser1 parser2 =
   in Parser aux
 
 let disjunction parser1 parser2 =
+  let open Result in
   let aux input =
     match run parser1 input with
     | (Success x) as result -> result
@@ -69,5 +81,16 @@ let one_of chars =
   |> List.map char
   |> choice
 
+let lowercase = one_of Char.lowers
+let uppercase = one_of Char.uppers
+let digit = one_of Char.digits
+let alphanumeric = one_of Char.alphanumerics
+
 let ( >& ) = followed
 let ( >| ) = disjunction
+let ( >|=) x f = map f x
+
+
+let apply fp xp = (fp >& xp) >|= (fun (f, x) -> f x)
+let (<*>) = apply
+let lift2 f parser1 parser2 = return f <*> parser1 <*> parser2
