@@ -28,4 +28,42 @@ struct
     | [] -> raise (Failure "Empty list")
     | x::xs -> List.fold_left f x xs
 
+  let range fpred fsucc x y =
+    let f = if x < y then fpred else fsucc in
+    let rec aux acc = function
+      | n when n = (f n) -> acc
+      | n -> aux (n :: acc) (f n)
+    in aux [] y
+
+  let seed = range pred succ
+
+  let char_seed =
+    let fpred x =
+      let c = int_of_char x in
+      char_of_int (pred c)
+    and fsucc x =
+      let c = int_of_char x in
+      char_of_int (succ c)
+    in range fpred fsucc
+
+end
+
+module Char =
+struct
+
+  (* external to_int : char-> int  = "%identity" *)
+  (* external of_int : int -> char = "%identity" *)
+
+  (* let move f  c = of_int (f (to_int c)) *)
+  (* let pred = move pred *)
+  (* let succ = move succ *)
+
+  (* let seed = List.range pred succ *)
+  (* let digits = seed '0' '9' *)
+  (* let lowers = seed 'a' 'z' *)
+  (* let uppers = seed 'A' 'Z' *)
+  (* let letters = lowers @ uppers *)
+  (* let alphanumerics = letters @ digits *)
+
+
 end
