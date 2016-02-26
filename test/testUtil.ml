@@ -41,8 +41,17 @@ let testSeed1 _ =
     assert_equal c 'C'
   | _ -> assert_failure "testSeed fail"
 
+
+let testDigits _ =
+  let l = Char.digits in
+  assert_equal 10 (List.length l);
+  match l with
+  | '0'::'1'::'2'::'3'::'4'::'5'::'6'::'7'::'8'::['9'] -> ()
+  | _ -> assert_failure "Invalid list"
+
 let suite = [
   "TestCharMove1"   >:: testCharMove1
 ; "TestCharMove2"   >:: testCharMove2
 ; "TestSeed1"       >:: testSeed1
+; "TestDigits"      >:: testDigits
 ]
