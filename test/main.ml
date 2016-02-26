@@ -31,6 +31,7 @@ let parserabZ = Parser.(choice [
     (char 'Z')]
   )
 
+let parseABCD = Parser.one_of ['A'; 'B'; 'C'; 'D' ]
 
 let extract_success = function
   | Result.Success x -> x
@@ -120,6 +121,29 @@ let testChoice4 _ =
     |> extract_failure
   in assert_equal (Parser.expected 'Z' 'z') message
 
+let testOneOf1 _ =
+  let (c, rem) =
+    Parser.run parseABCD "AFOO"
+    |> extract_success
+  in assert_equal (c, rem) ('A', "FOO")
+
+let testOneOf2 _ =
+  let (c, rem) =
+    Parser.run parseABCD "BFOO"
+    |> extract_success
+  in assert_equal (c, rem) ('B', "FOO")
+
+let testOneOf3 _ =
+  let (c, rem) =
+    Parser.run parseABCD "CFOO"
+    |> extract_success
+  in assert_equal (c, rem) ('C', "FOO")
+
+let testOneOf4 _ =
+  let (c, rem) =
+    Parser.run parseABCD "DFOO"
+    |> extract_success
+  in assert_equal (c, rem) ('D', "FOO")
 
 let suite =
   "OUnit tests for Parser" >::: [
@@ -134,6 +158,11 @@ let suite =
   ; "testChoice2"      >:: testChoice2
   ; "testChoice3"      >:: testChoice3
   ; "testChoice4"      >:: testChoice4
+  ; "testOneOf1"       >:: testOneOf1
+  ; "testOneOf1"       >:: testOneOf1
+  ; "testOneOf2"       >:: testOneOf2
+  ; "testOneOf3"       >:: testOneOf3
+  ; "testOneOf4"       >:: testOneOf4
   ]
 
 let _ = run_test_tt_main suite
