@@ -33,6 +33,9 @@ let parserabZ = Parser.(choice [
 
 let parseABCD = Parser.one_of ['A'; 'B'; 'C'; 'D' ]
 
+let test_expectation message a b =
+  assert_equal message (Parser.expected a b)
+
 let extract_success = function
   | Result.Success x -> x
   | _ -> failwith "Improbable case"
@@ -53,7 +56,7 @@ let testParseChar2 _ =
   let message =
     Parser.run parseA "BHA"
     |> extract_failure
-   in assert_equal (Parser.expected 'A' 'B') message
+  in test_expectation message 'A' 'B'
 
 let testFollowed1 _ =
   let ((a, b), remaining) =
@@ -70,8 +73,8 @@ let testFollowed2 _ =
     Parser.run parseAandB "BAFOO"
     |> extract_failure
   in
-  assert_equal (Parser.expected 'B' 'Z') message;
-  assert_equal (Parser.expected 'A' 'B') message2
+  test_expectation message 'B' 'Z';
+  test_expectation message2 'A' 'B'
 
 let testDisjunction1 _ =
   let (c, rem) =
@@ -119,7 +122,7 @@ let testChoice4 _ =
   let message =
     Parser.run parserabZ "zReste"
     |> extract_failure
-  in assert_equal (Parser.expected 'Z' 'z') message
+  in test_expectation message 'Z' 'z'
 
 let testOneOf1 _ =
   let (c, rem) =
@@ -145,6 +148,12 @@ let testOneOf4 _ =
     |> extract_success
   in assert_equal (c, rem) ('D', "FOO")
 
+let testOneOf5 _ =
+  let message =
+    Parser.run parseABCD "ZFOO"
+    |> extract_failure
+  in test_expectation message 'D' 'Z'
+
 let suite =
   "OUnit tests for Parser" >::: [
     "testParseChar1"   >:: testParseChar1
@@ -163,6 +172,7 @@ let suite =
   ; "testOneOf2"       >:: testOneOf2
   ; "testOneOf3"       >:: testOneOf3
   ; "testOneOf4"       >:: testOneOf4
+  (* ; "testOneOf5"       >:: testOneOf5 *)
   ]
 
 let _ = run_test_tt_main suite
