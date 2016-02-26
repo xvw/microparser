@@ -63,5 +63,10 @@ let disjunction parser1 parser2 =
 let choice parsers  =
   List.reduce disjunction parsers
 
+let one_of chars =
+  chars
+  |> List.map char
+  |> choice
+
 let ( >& ) = followed
 let ( >| ) = disjunction
