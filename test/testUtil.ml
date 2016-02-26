@@ -19,45 +19,30 @@
  *
 *)
 
-module List =
-struct
 
-  include List
+open OUnit
+open Util
 
-  let reduce f = function
-    | [] -> raise (Failure "Empty list")
-    | x::xs -> List.fold_left f x xs
+let testCharMove1 _ =
+  assert_equal (Char.succ 'A') 'B';
+  assert_equal (Char.succ 'B') 'C';
+  assert_equal (Char.succ '0') '1'
 
-  let range fpred fsucc x y =
-    let f = if x < y then fpred else fsucc in
-    let rec aux acc = function
-      | n when n = (f x) -> acc
-      | n -> aux (n :: acc) (f n)
-    in aux [] y
+let testCharMove2 _ =
+  assert_equal (Char.pred 'B') 'A';
+  assert_equal (Char.pred 'C') 'B';
+  assert_equal (Char.pred '9') '8'
 
-  let seed = range pred succ
+let testSeed1 _ =
+  match Char.seed 'A' 'C' with
+  | a::b::[c] ->
+    assert_equal a 'A';
+    assert_equal b 'B';
+    assert_equal c 'C'
+  | _ -> assert_failure "testSeed fail"
 
-end
-
-module Char =
-struct
-
-  include Char
-
-  let to_int = code
-  let of_int = chr
-
-  let move f c = of_int (f (to_int c))
-  let pred = move pred
-  let succ = move succ
-
-  let seed = List.range pred succ
-  let digits = seed '0' '9'
-  let lowers = seed 'a' 'z'
-  let uppers = seed 'A' 'Z'
-  let letters = lowers @ uppers
-  let alphanumerics = letters @ digits
-
-
-
-end
+let suite = [
+  "TestCharMove1"   >:: testCharMove1
+; "TestCharMove2"   >:: testCharMove2
+; "TestSeed1"       >:: testSeed1
+]

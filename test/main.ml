@@ -22,8 +22,14 @@
 
 open OUnit
 
-let suite =
-  "OUnit tests for Parser" >::: TestParser.suite
+let suites  = [
+  "Tests for Util"   >::: TestUtil.suite
+; "Tests for Parser" >::: TestParser.suite
+]
 
-let _ = run_test_tt_main suite
+let () =
+  List.iter
+    (fun x -> run_test_tt_main x |> ignore)
+    suites
+
 
