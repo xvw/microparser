@@ -49,9 +49,17 @@ let testDigits _ =
   | '0'::'1'::'2'::'3'::'4'::'5'::'6'::'7'::'8'::['9'] -> ()
   | _ -> assert_failure "Invalid list"
 
+let testListInit1 _ =
+  let l = List.init 5 (fun x -> x) in
+  assert_equal 5 (List.length l);
+  match l with
+  | 0 :: 1 :: 2 :: 3 :: 4 :: [] -> ()
+  | _ -> assert_failure "Invalid list"
+
 let suite = [
   "TestCharMove1"   >:: testCharMove1
 ; "TestCharMove2"   >:: testCharMove2
 ; "TestSeed1"       >:: testSeed1
 ; "TestDigits"      >:: testDigits
+; "TestListInit"    >:: testListInit1
 ]
