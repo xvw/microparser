@@ -20,27 +20,34 @@
 *)
 
 
-type 'a result = ('a *string, string) Result.t
-type 'a t = Parser of (string -> 'a result)
+
 open Util
+
+type 'a base = Parser of (string -> ('a * string) Result.t)
 
 let run parser input =
   let Parser f = parser in
   f input
 
-let return x =
-  Parser (fun input -> Result.Success (x, input))
+
+module Requirement = Olmi.Make.WithBind(struct
+    type 'a t = 'a base
+    let return x = Parser (fun input -> Result.Success (x, input))
+    let bind parser f =
+      let aux input =
+        let result = run parser input in
+        match result with
+        | Result.Failure err -> Result.fail err
+        | Result.Success (x, xs) -> run (f x) xs
+      in Parser aux
+  end)
+
+include Olmi.Make.Monad(Requirement)
+
+let map = fmap
 
 let expected =
   Printf.sprintf "Excepted %c, got %c"
-
-let map f parser =
-  let open Result in
-  let aux input =
-    match run parser input with
-    | Success (x, xs) -> return (f x, xs)
-    | Failure err -> fail err
-  in Parser aux
 
 let char c =
   let open Result in
@@ -53,16 +60,9 @@ let char c =
   in Parser aux
 
 let followed parser1 parser2 =
-  let open Result in
-  let aux input =
-    match run parser1 input with
-    | Failure x as failure-> failure
-    | Success (x, xs) -> begin
-        match run parser2 xs with
-        | Failure x as failure-> failure
-        | Success (y, ys) -> return ((x, y), ys)
-      end
-  in Parser aux
+  parser1 >>= fun result1 ->
+  parser2 >>= fun result2 ->
+  return (result1, result2)
 
 let disjunction parser1 parser2 =
   let open Result in
@@ -72,6 +72,14 @@ let disjunction parser1 parser2 =
     | _ -> run parser2 input
   in Parser aux
 
+let seq parsers =
+  let cons = liftM2 List.cons in
+  let rec aux = function
+    | [] -> return []
+    | x::xs -> cons x (aux xs)
+  in aux parsers
+
+let apply = ( <*> )
 
 let choice parsers  =
   List.reduce disjunction parsers
@@ -81,16 +89,18 @@ let one_of chars =
   |> List.map char
   |> choice
 
+
+
 let lowercase = one_of Char.lowers
 let uppercase = one_of Char.uppers
 let digit = one_of Char.digits
 let alphanumeric = one_of Char.alphanumerics
+
+
 
 let ( >& ) = followed
 let ( >| ) = disjunction
 let ( >|=) x f = map f x
 
 
-let apply fp xp = (fp >& xp) >|= (fun (f, x) -> f x)
-let (<*>) = apply
-let lift2 f parser1 parser2 = return f <*> parser1 <*> parser2
+

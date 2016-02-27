@@ -21,30 +21,26 @@
 
 let id x = x
 
-type ('success, 'failure) t =
-  | Success of 'success
-  | Failure of 'failure
+type 'a base =
+  | Success of 'a
+  | Failure of string
+
 
 let either result fsuccess ffailure =
   match result with
   | Success x -> fsuccess x
   | Failure x -> ffailure x
 
-
-let return x = Success x
-let succeed = return
 let fail x = Failure x
 
-let bind x f = either x f fail
+module Requirement = Olmi.Make.WithBind(struct
 
-let ( >>= ) = bind
-let ( >>  ) m k = m >>= (fun _ -> k)
-let ( >=> ) s1 s2 x = s1 >> (x >>= s2)
+    type 'a t = 'a base
+    let return x = Success x
+    let bind x f = either x f fail
 
-let join x = x >>= id
-let lift f x = x >>= (fun y -> return (f y))
-let fmap f result = result >>= ( fun x -> return (f x) )
-let ( <$> ) = fmap
-let ( <*> ) fs rs =
-  fs >>= fun f ->
-  rs >>= fun x -> return (f x)
+  end)
+
+include Olmi.Make.Monad (Requirement)
+
+let succeed = return

@@ -155,6 +155,24 @@ let testOneOf5 _ =
     |> extract_failure
   in test_expectation message 'D' 'Z'
 
+let testCombined1 _ =
+  let parsers = [Parser.char 'A'; Parser.char 'B'; Parser.char 'C'] in
+  let (x, r) =
+    Parser.run (Parser.seq parsers) "ABCD"
+    |> extract_success
+  in let _ =
+       match x with
+       | 'A' :: 'B' :: 'C' :: [] -> ()
+       | _ -> assert_failure "Not according"
+  in assert_equal "D" r
+
+let testCombined2 _ =
+  let parsers = [Parser.char 'A'; Parser.char 'B'; Parser.char 'C'] in
+  let m =
+    Parser.run (Parser.seq parsers) "AZCD"
+    |> extract_failure
+  in test_expectation m 'B' 'Z'
+
 let suite = [
   "testParseChar1"   >:: testParseChar1
 ; "testParseChar2"   >:: testParseChar2
@@ -173,4 +191,6 @@ let suite = [
 ; "testOneOf3"       >:: testOneOf3
 ; "testOneOf4"       >:: testOneOf4
 ; "testOneOf5"       >:: testOneOf5
+; "testCombined1"    >:: testCombined1
+; "testCombined2"    >:: testCombined2
 ]

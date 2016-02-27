@@ -37,6 +37,21 @@ struct
 
   let seed = range pred succ
 
+  module Requirement = Olmi.Make.WithJoin(struct
+      type 'a t = 'a list
+      let return x = [x]
+      let join = flatten
+      let fmap = map
+    end)
+
+  include Olmi.Make.Plus (Requirement) (struct
+      type 'a t = 'a list
+      let mempty = []
+      let mplus = append
+    end)
+
+  let cons x xs = x::xs
+
 end
 
 module Char =

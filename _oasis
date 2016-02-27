@@ -14,6 +14,7 @@ Library "parser"
   Path: lib
   Modules: Parser
   InternalModules: Result, Util
+  BuildDepends: olmi
 
 
 Executable "test_parser"
