@@ -90,6 +90,20 @@ let one_of chars =
   |> List.map char
   |> choice
 
+let rec zom parser input =
+  match run parser input with
+  | Result.Failure err -> ([], input)
+  | Result.Success (x, xs) ->
+    let xx, xxs = zom parser xs in
+    (x::xx, xxs)
+
+let zero_or_more parser =
+  Parser (fun input -> Result.return (zom parser input))
+
+let one_or_more parser =
+  parser >>= fun x ->
+  zero_or_more parser >>= fun xs ->
+  return (x :: xs)
 
 
 let lowercase = one_of Char.lowers
