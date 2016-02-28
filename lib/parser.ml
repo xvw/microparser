@@ -23,7 +23,8 @@
 
 open Util
 
-type 'a base = Parser of (string -> ('a * string) Result.t)
+type 'a base =
+  | Parser of (string -> ('a * string) Result.t)
 
 let run parser input =
   let Parser f = parser in
@@ -106,6 +107,3 @@ let string str =
 let ( >& ) = followed
 let ( >| ) = disjunction
 let ( >|=) x f = map f x
-
-
-

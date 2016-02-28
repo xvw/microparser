@@ -31,6 +31,7 @@ let parserabZ = Parser.(choice [
   )
 
 let parseABCD = Parser.one_of ['A'; 'B'; 'C'; 'D' ]
+let parseABC = Parser.string "ABC"
 
 let test_expectation message a b =
   assert_equal message (Parser.expected a b)
@@ -173,6 +174,20 @@ let testCombined2 _ =
     |> extract_failure
   in test_expectation m 'B' 'Z'
 
+let testString1 _ =
+  let (x, xs) =
+    Parser.run parseABC "ABCDE"
+    |> extract_success
+  in assert_equal x "ABC";
+  assert_equal xs "DE"
+
+let testString2 _ =
+  let message =
+    Parser.run parseABC "ACBDE"
+    |> extract_failure
+  in test_expectation message 'B' 'C'
+
+
 let suite = [
   "testParseChar1"   >:: testParseChar1
 ; "testParseChar2"   >:: testParseChar2
@@ -193,4 +208,6 @@ let suite = [
 ; "testOneOf5"       >:: testOneOf5
 ; "testCombined1"    >:: testCombined1
 ; "testCombined2"    >:: testCombined2
+; "testString1"      >:: testString1
+; "testString2"      >:: testString2
 ]
