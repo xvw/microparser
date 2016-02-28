@@ -31,21 +31,20 @@ let run parser input =
   f input
 
 
-module Requirement = Olmi.Make.WithBind(struct
-    type 'a t = 'a base
-    let return x = Parser (fun input -> Result.Success (x, input))
-    let bind parser f =
-      let aux input =
-        let result = run parser input in
-        match result with
-        | Result.Failure err -> Result.fail err
-        | Result.Success (x, xs) -> run (f x) xs
-      in Parser aux
-  end)
+include Olmi.Make.Monad(Olmi.Make.WithBind(
+    struct
+      type 'a t = 'a base
+      let return x = Parser (fun input -> Result.Success (x, input))
+      let bind parser f =
+        let aux input =
+          let result = run parser input in
+          match result with
+          | Result.Failure err -> Result.fail err
+          | Result.Success (x, xs) -> run (f x) xs
+        in Parser aux
+    end)
+    )
 
-include Olmi.Make.Monad(Requirement)
-
-let map = fmap
 
 let expected =
   Printf.sprintf "Excepted %c, got %c"
