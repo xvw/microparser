@@ -80,8 +80,6 @@ let seq parsers =
     | x::xs -> cons x (aux xs)
   in aux parsers
 
-let apply = ( <*> )
-
 let choice parsers  =
   List.reduce disjunction parsers
 
