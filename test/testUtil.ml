@@ -71,6 +71,10 @@ let testListOfStr3 _ =
   | 'f'::'B'::'o'::[] -> ()
   | _ -> assert_failure "Invalid list"
 
+let testStrOfList1 _ = assert_equal (String.of_list []) ""
+let testStrOfList2 _ = assert_equal (String.of_list ['d']) "d"
+let testStrOfList3 _ = assert_equal (String.of_list ['d'; 'F']) "dF"
+
 let suite = [
   "TestCharMove1"   >:: testCharMove1
 ; "TestCharMove2"   >:: testCharMove2
@@ -80,4 +84,7 @@ let suite = [
 ; "TestListOfStr1"  >:: testListOfStr1
 ; "TestListOfStr2"  >:: testListOfStr2
 ; "TestListOfStr3"  >:: testListOfStr3
+; "TestStrOfList1"  >:: testStrOfList1
+; "TestStrOfList2"  >:: testStrOfList2
+; "TestStrOfList2"  >:: testStrOfList3
 ]

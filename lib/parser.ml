@@ -96,7 +96,12 @@ let uppercase = one_of Char.uppers
 let digit = one_of Char.digits
 let alphanumeric = one_of Char.alphanumerics
 
-
+let string str =
+  str
+  |> List.of_string
+  |> List.map char
+  |> seq
+  |> fmap String.of_list
 
 let ( >& ) = followed
 let ( >| ) = disjunction

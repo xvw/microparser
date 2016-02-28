@@ -80,6 +80,20 @@ struct
   let letters = lowers @ uppers
   let alphanumerics = letters @ digits
 
+end
 
+module String =
+struct
+
+  include String
+
+  let of_list list =
+    let result = Bytes.create (List.length list) in
+    let rec aux i = function
+      | [] -> Bytes.to_string result
+      | x :: xs ->
+        let _ = Bytes.set result i x in
+        aux (succ i) xs
+    in aux 0 list
 
 end
