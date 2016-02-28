@@ -188,6 +188,47 @@ let testString2 _ =
   in test_expectation message 'B' 'C'
 
 
+let testZeroOrMore1 _ =
+  let parser = Parser.zero_or_more (Parser.string "foo") in
+  let x, xs =
+    Parser.run parser "foofoobar"
+    |> extract_success
+  in
+  let _ = match x with
+    | "foo" :: "foo" :: [] -> ()
+    | _ -> assert_failure "Invalid List"
+  in assert_equal "bar" xs
+
+let testZeroOrMore2 _ =
+  let parser = Parser.zero_or_more (Parser.string "foo") in
+  let x, xs =
+    Parser.run parser "zfoobar"
+    |> extract_success
+  in
+  let _ = match x with
+    | [] -> ()
+    | _ -> assert_failure "Invalid List"
+  in assert_equal "zfoobar" xs
+
+let testOneOrMore1 _ =
+  let parser = Parser.one_or_more (Parser.string "foo") in
+  let x, xs =
+    Parser.run parser "foofoobar"
+    |> extract_success
+  in
+  let _ = match x with
+    | "foo" :: "foo" :: [] -> ()
+    | _ -> assert_failure "Invalid List"
+  in assert_equal "bar" xs
+
+
+let testOneOrMore2 _ =
+  let parser = Parser.one_or_more (Parser.string "foo") in
+  let message =
+    Parser.run parser "zfoobar"
+    |> extract_failure
+  in test_expectation message 'f' 'z'
+
 let suite = [
   "testParseChar1"   >:: testParseChar1
 ; "testParseChar2"   >:: testParseChar2
@@ -210,4 +251,8 @@ let suite = [
 ; "testCombined2"    >:: testCombined2
 ; "testString1"      >:: testString1
 ; "testString2"      >:: testString2
+; "testZeroOrMore1"  >:: testZeroOrMore1
+; "testZeroOrMore2"  >:: testZeroOrMore2
+; "testOneOrMore1"   >:: testOneOrMore1
+; "testOneOrMore2"   >:: testOneOrMore2
 ]
