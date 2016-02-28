@@ -56,10 +56,28 @@ let testListInit1 _ =
   | 0 :: 1 :: 2 :: 3 :: 4 :: [] -> ()
   | _ -> assert_failure "Invalid list"
 
+let testListOfStr1 _ =
+  match List.of_string "" with
+  | [] -> ()
+  | _ -> assert_failure "Invalid list"
+
+let testListOfStr2 _ =
+  match List.of_string "foo" with
+  | 'f'::'o'::'o'::[] -> ()
+  | _ -> assert_failure "Invalid list"
+
+let testListOfStr3 _ =
+  match List.of_string "fBo" with
+  | 'f'::'B'::'o'::[] -> ()
+  | _ -> assert_failure "Invalid list"
+
 let suite = [
   "TestCharMove1"   >:: testCharMove1
 ; "TestCharMove2"   >:: testCharMove2
 ; "TestSeed1"       >:: testSeed1
 ; "TestDigits"      >:: testDigits
 ; "TestListInit"    >:: testListInit1
+; "TestListOfStr1"  >:: testListOfStr1
+; "TestListOfStr2"  >:: testListOfStr2
+; "TestListOfStr3"  >:: testListOfStr3
 ]

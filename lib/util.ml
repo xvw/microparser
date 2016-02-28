@@ -51,11 +51,13 @@ struct
     end)
 
   let cons x xs = x::xs
-  let init i f = seed 0 (i -1) >|= (fun x -> f x)
+  let init i f =
+    if (i <= 0) then []
+    else seed 0 (i-1) >|= (fun x -> f x)
 
-  (* let of_string str = *)
-  (*   let len = String.length str in *)
-  (*   List.init *)
+  let of_string str =
+    let len = String.length str in
+    init len (fun x -> str.[x])
 
 end
 
