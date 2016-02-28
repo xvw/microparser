@@ -120,4 +120,3 @@ let string str =
 
 let ( >& ) = followed
 let ( >| ) = disjunction
-let ( >|=) x f = map f x
