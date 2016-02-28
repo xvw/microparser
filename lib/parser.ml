@@ -102,11 +102,11 @@ let one_or_more parser =
   zero_or_more parser >>= fun xs ->
   return (x :: xs)
 
-
 let lowercase = one_of Char.lowers
 let uppercase = one_of Char.uppers
 let digit = one_of Char.digits
 let alphanumeric = one_of Char.alphanumerics
+let whitespace = one_of [' '; '\n'; '\t' ]
 
 let string str =
   str
@@ -114,6 +114,11 @@ let string str =
   |> List.map char
   |> seq
   |> fmap String.of_list
+
+let next_int =
+  let to_i list = int_of_string (String.of_list list) in
+  one_or_more (digit)
+  |> fmap to_i
 
 let ( >& ) = followed
 let ( >| ) = disjunction
